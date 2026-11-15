@@ -1,7 +1,0 @@
-### Diego Arteaga Palomo - KIT - 2768902
-
-#SET MATERIAL INDECES
-
-select("Waveguide");
-set("material",WG_n);
-
