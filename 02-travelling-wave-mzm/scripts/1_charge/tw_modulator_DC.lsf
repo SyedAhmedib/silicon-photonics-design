@@ -1,0 +1,45 @@
+# PROJECT DESIGN B: TRAVELLING WAVE MODULATOR
+
+# CHARGE DC
+
+# Setup simulation bias
+
+vmin = 0; vmax = 4; N = 9;
+dv = 0.025;
+vdv = matrix(2*N,1);
+vdv(1:2:(2*N)) = linspace(vmin,vmax,N);
+vdv(2:2:(2*N)) = vdv(1:2:(2*N)) + sign(vmax)*dv;
+
+
+switchtolayout;
+setnamed('CHARGE::boundary conditions::cathode','sweep type','value');
+setnamed('CHARGE::boundary conditions::cathode','value table',vdv);
+setnamed('CHARGE::monitor_xzplane','save data',0);
+
+
+#Run
+run('CHARGE');
+
+#Save charge data
+carrier_density = getresult('CHARGE::monitor_xzplane', 'charge');
+matlabsave('tw_modulator_DC_results', carrier_density);
+
+#Calculate capacitance
+
+total_charge = getresult('CHARGE::monitor_xzplane','total_charge');
+Qn = e*pinch(total_charge.n);
+Qp = e*pinch(total_charge.p);
+
+Cn = abs(Qn(2:2:(2*N))-Qn(1:2:(2*N)))/dv;
+Cp = abs(Qp(2:2:(2*N))-Qp(1:2:(2*N)))/dv;
+V = vdv(1:2:(2*N));
+C_static = 0.5*(Cn+Cp)*1e15*1e-6;  # fF/um
+
+#Visualize
+plotxy(V,C_static,"Voltage (V)","Capacitance (fF/um)");
+legend('Simulation');
+
+#Save to file for export into INTERCONNECT (for MODE only C at zero bias will be set manually)
+C_static = C_static*1e-15*1e6; #F/m
+Cdc = [vdv(1:2:(2*N)),C_static];
+matlabsave('tw_modulator_DC_C_results',Cdc);
