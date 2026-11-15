@@ -1,0 +1,10 @@
+# Large Lumerical project / result files
+*.lms
+*.fsp
+*.ldev
+*.ich
+*_p0.log
+*.zip
+*.rar
+*.mat
+.DS_Store
